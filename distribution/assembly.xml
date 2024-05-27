@@ -17,5 +17,13 @@
             <outputDirectory>/</outputDirectory>
             <destName>application-default.properties</destName>
         </file>
+        <file>
+            <source>${project.basedir}/start.sh</source>
+            <outputDirectory>/</outputDirectory>
+        </file>
+        <file>
+            <source>${project.basedir}/stop.sh</source>
+            <outputDirectory>/</outputDirectory>
+        </file>
     </files>
 </assembly>

@@ -6,6 +6,6 @@ if  [ -z ${CONSOLE_LOG_FILE_NAME} ]; then
   CONSOLE_LOG_FILE_NAME='/dev/null'
 fi
 
-nohup /home/das/jdk17/bin/java -jar ${JAVA_D_PARAMS} TimeService.jar >> ${CONSOLE_LOG_FILE_NAME} &
+nohup /home/das/jdk17/bin/java -jar TimeService.jar >> ${CONSOLE_LOG_FILE_NAME} &
 
 exit 0
