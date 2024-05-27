@@ -2,7 +2,7 @@
 ### _Web Application to get current time_
 #### It could be used as demo Spring Boot application
 
-[![https://img.shields.io/badge/Java-17-white](https://img.shields.io/badge/Java-17-white)](https://www.java.com/) [![https://img.shields.io/badge/Spring-Boot-green](https://img.shields.io/badge/Spring-Boot-green)](https://spring.io/)
+[![https://img.shields.io/badge/Java-17-white](https://img.shields.io/badge/Java-17-white)](https://www.java.com/) [![https://img.shields.io/badge/Spring-Boot-green](https://img.shields.io/badge/Spring-Boot-green)](https://spring.io/) ![](https://github.com/anrydas/TimeService/actions/workflows/maven.yml/badge.svg)
 
 ### 📃 Features
 - lightweight
