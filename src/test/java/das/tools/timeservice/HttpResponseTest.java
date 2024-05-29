@@ -16,6 +16,7 @@ import org.springframework.http.ResponseEntity;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.Instant;
+import java.util.Date;
 import java.util.regex.Pattern;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -37,7 +38,7 @@ public class HttpResponseTest {
     }
 
     @Test
-    void epochGetShouldReturnJsonWithOkStatusAndDigitalEpochTimeLessThanNow() {
+    void epochGetShouldReturnJsonWithOkStatusAndEpochTimeLessThanNow() {
         String url = this.baseUrl + EPOCH_TIME_API_PATH;
         log.info("testing URL={}", url);
         AppResponse response = this.restTemplate.getForObject(url, AppResponse.class);
@@ -49,7 +50,7 @@ public class HttpResponseTest {
     }
 
     @Test
-    void epochPostShouldReturnJsonWithOkStatusAndDigitalEpochTimeLessThanNow() {
+    void epochPostShouldReturnJsonWithOkStatusAndTimeLessThanNow() {
         String url = this.baseUrl + EPOCH_TIME_API_PATH;
         log.info("testing URL={}", url);
         HttpHeaders headers = new HttpHeaders();
@@ -65,7 +66,7 @@ public class HttpResponseTest {
     }
 
     @Test
-    void fmtGetShouldReturnJsonWithOkStatusAndDigitalEpochTimeLessThanNow() {
+    void fmtGetShouldReturnJsonWithOkStatusAndTimeLessThanNow() {
         String url = this.baseUrl + FORMATTED_TIME_API_PATH;
         log.info("testing URL={}", url);
         AppResponse response = this.restTemplate.getForObject(url, AppResponse.class);
@@ -85,7 +86,7 @@ public class HttpResponseTest {
     }
 
     @Test
-    void fmtPostShouldReturnJsonWithOkStatusAndDigitalEpochTimeLessThanNow() {
+    void fmtPostShouldReturnJsonWithOkStatusAndEpochTimeLessThanNow() {
         String url = this.baseUrl + FORMATTED_TIME_API_PATH;
         log.info("testing URL={}", url);
         HttpHeaders headers = new HttpHeaders();
@@ -107,5 +108,23 @@ public class HttpResponseTest {
         } catch (ParseException e) {
             assertThat(true).isFalse();
         }
+    }
+
+    @Test
+    void epochGetShouldReturnJsonWithOkStatusAndEpochTimeLessThanNowForFiveDays() {
+        int valueToAdd = -5;
+        String url = this.baseUrl + EPOCH_TIME_API_PATH + "?d=" + valueToAdd;
+        log.info("testing URL={}", url);
+        AppResponse response = this.restTemplate.getForObject(url, AppResponse.class);
+        assertThat(response.getStatus()).isSameAs(ResponseStatus.OK);
+        long time = response.getEpochTime();
+        Instant now = Instant.now();
+        Pattern pattern = Pattern.compile("^\\d{13}$");
+        assertThat(pattern.matcher(String.valueOf(time)).find()).isTrue();
+        assertThat(time).isLessThan(now.plusSeconds(5 * 60).toEpochMilli());
+        SimpleDateFormat sdf = new SimpleDateFormat("DD");
+        int nowDay = Integer.parseInt(sdf.format(Date.from(now)));
+        int dayCorrected = Integer.parseInt(sdf.format(new Date(time)));
+        assertThat(nowDay + valueToAdd == dayCorrected).isTrue();
     }
 }

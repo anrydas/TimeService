@@ -18,17 +18,17 @@ public class TimeController {
     }
 
     @RequestMapping(value="/epoch", method = { RequestMethod.GET, RequestMethod.POST })
-    public ResponseEntity<?> getEpochTime() {
-        return ResponseEntity.ok(timeService.getEpochTime());
+    public ResponseEntity<?> getEpochTime(@RequestParam(value = "h", defaultValue = "0", required = false) int hour,
+                                          @RequestParam(value = "m", defaultValue = "0", required = false) int minute,
+                                          @RequestParam(value = "d", defaultValue = "0", required = false) int day) {
+        return ResponseEntity.ok(timeService.getEpochTime(hour, minute, day));
     }
 
-    /*@PostMapping("/epoch")
-    public ResponseEntity<?> getEpochTime() {
-        return ResponseEntity.ok(timeService.getEpochTime());
-    }*/
-
     @RequestMapping(value = "/fmt", method = { RequestMethod.GET, RequestMethod.POST })
-    public ResponseEntity<?> getFormattedTime(@RequestParam(value = "mask", required = false) String mask) {
-        return ResponseEntity.ok(timeService.getFormattedTime(mask));
+    public ResponseEntity<?> getFormattedTime(@RequestParam(value = "mask", required = false) String mask,
+                                              @RequestParam(value = "h", defaultValue = "0", required = false) int hour,
+                                              @RequestParam(value = "m", defaultValue = "0", required = false) int minute,
+                                              @RequestParam(value = "d", defaultValue = "0", required = false) int day) {
+        return ResponseEntity.ok(timeService.getFormattedTime(mask, hour, minute, day));
     }
 }
