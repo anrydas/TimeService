@@ -1,15 +1,14 @@
 package das.tools.timeservice.controller;
 
-import das.tools.timeservice.entity.AppResponse;
-import das.tools.timeservice.entity.ResponseStatus;
 import das.tools.timeservice.service.TimeService;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
-
-import java.time.Instant;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/api/v1")
+@RequestMapping("${server.api.prefix}/api/v1")
 public class TimeController {
     private final TimeService timeService;
 
