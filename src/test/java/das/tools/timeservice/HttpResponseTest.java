@@ -51,7 +51,8 @@ public class HttpResponseTest {
         AppResponse response = this.restTemplate.getForObject(url, AppResponse.class);
         assertThat(response.getStatus()).isSameAs(ResponseStatus.OK);
         long time = response.getEpochTime();
-        assertThat(time).isLessThan(Instant.now().toEpochMilli());
+        long actualTime = Instant.now().toEpochMilli();
+        assertThat(time).isLessThan(actualTime);
         Pattern pattern = Pattern.compile("^\\d{13}$");
         assertThat(pattern.matcher(String.valueOf(time)).find()).isTrue();
     }
