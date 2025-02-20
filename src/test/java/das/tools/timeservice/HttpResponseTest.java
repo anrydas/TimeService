@@ -13,6 +13,7 @@ import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
+import org.springframework.test.context.TestPropertySource;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -26,9 +27,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 @Slf4j
 public class HttpResponseTest {
     @Value("${server.api.prefix}")
-    private static String apiPrefix = "/TimeService"; //ToDo: make it depedent on application.roperties confid
-    protected static final String FORMATTED_TIME_API_PATH = apiPrefix + "/api/v1/fmt";
-    protected static final String EPOCH_TIME_API_PATH = apiPrefix + "/api/v1/epoch";
+    private String apiPrefix;
+    private String FORMATTED_TIME_API_PATH;
+    private String EPOCH_TIME_API_PATH;
     @LocalServerPort
     private int port;
     private String baseUrl;
@@ -38,10 +39,13 @@ public class HttpResponseTest {
     @PostConstruct
     private void postConstruct() {
         this.baseUrl = "http://localhost:" + port;
+        FORMATTED_TIME_API_PATH = apiPrefix + "/api/v1/fmt";
+        EPOCH_TIME_API_PATH = apiPrefix + "/api/v1/epoch";
     }
 
     @Test
     void epochGetShouldReturnJsonWithOkStatusAndEpochTimeLessThanNow() {
+        System.out.println(apiPrefix);
         String url = this.baseUrl + EPOCH_TIME_API_PATH;
         log.info("testing URL={}", url);
         AppResponse response = this.restTemplate.getForObject(url, AppResponse.class);
