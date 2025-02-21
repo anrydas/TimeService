@@ -2,7 +2,6 @@ package das.tools.timeservice.service;
 
 import das.tools.timeservice.entity.AppResponse;
 import das.tools.timeservice.entity.ResponseStatus;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.sql.Date;

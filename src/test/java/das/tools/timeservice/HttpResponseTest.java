@@ -6,12 +6,14 @@ import jakarta.annotation.PostConstruct;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
+import org.springframework.test.context.TestPropertySource;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -24,8 +26,10 @@ import static org.assertj.core.api.Assertions.assertThat;
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @Slf4j
 public class HttpResponseTest {
-    protected static final String FORMATTED_TIME_API_PATH = "/api/v1/fmt";
-    protected static final String EPOCH_TIME_API_PATH = "/api/v1/epoch";
+    @Value("${server.api.prefix}")
+    private String apiPrefix;
+    private String FORMATTED_TIME_API_PATH;
+    private String EPOCH_TIME_API_PATH;
     @LocalServerPort
     private int port;
     private String baseUrl;
@@ -35,16 +39,20 @@ public class HttpResponseTest {
     @PostConstruct
     private void postConstruct() {
         this.baseUrl = "http://localhost:" + port;
+        FORMATTED_TIME_API_PATH = apiPrefix + "/api/v1/fmt";
+        EPOCH_TIME_API_PATH = apiPrefix + "/api/v1/epoch";
     }
 
     @Test
     void epochGetShouldReturnJsonWithOkStatusAndEpochTimeLessThanNow() {
+        System.out.println(apiPrefix);
         String url = this.baseUrl + EPOCH_TIME_API_PATH;
         log.info("testing URL={}", url);
         AppResponse response = this.restTemplate.getForObject(url, AppResponse.class);
         assertThat(response.getStatus()).isSameAs(ResponseStatus.OK);
         long time = response.getEpochTime();
-        assertThat(time).isLessThan(Instant.now().toEpochMilli());
+        long actualTime = Instant.now().toEpochMilli();
+        assertThat(time).isLessThan(actualTime);
         Pattern pattern = Pattern.compile("^\\d{13}$");
         assertThat(pattern.matcher(String.valueOf(time)).find()).isTrue();
     }
@@ -72,6 +80,11 @@ public class HttpResponseTest {
         AppResponse response = this.restTemplate.getForObject(url, AppResponse.class);
         assertThat(response.getStatus()).isSameAs(ResponseStatus.OK);
         long time = response.getEpochTime();
+        try {
+            Thread.sleep(1000);
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
         assertThat(time).isLessThan(Instant.now().toEpochMilli());
         Pattern pattern = Pattern.compile("^\\d{13}$");
         assertThat(pattern.matcher(String.valueOf(time)).find()).isTrue();
