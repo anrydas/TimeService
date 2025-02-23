@@ -9,6 +9,7 @@
 - using POST or GET methods for any endpoint
 - using mask for time formatting
 - JSON result
+- configuring REST prefix
 
 ### 📌 REST Endpoints
 #### It made for getting time from the outside if it couldn't be got for any reason like too old system, NTP daemon installation impossibility, etc.
@@ -32,11 +33,17 @@
   - `dd-MMM-yyyy`
   - `hh:mm:ss`
   - `yyyy G`
-
 From **release 1.4.0** the application supports **request parameters** to change returned time:
 - h - increment or decrement returned **hour**
 - m - increment or decrement returned **minute**
 - d - increment or decrement returned **day**
-For example: `/api/v1/epoch?d=-3` returns time **decremented by 3** days from now
+  For example: `/api/v1/epoch?d=-3` returns time **decremented by 3** days from now
+
+- (**_POST or GET)_** **/api/v1/health** - returns service's health with response **status code 200**
+  ```
+    "OK"
+  ```
+
+From version 1.4.2 it is possible to configure RESP prefix in **application.properties** file in **server.api.prefix** parameter. The default value is `/TimeService`
 
 ###### _Made by -=:dAs:=-_
