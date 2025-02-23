@@ -10,7 +10,7 @@
     </parent>
     <groupId>das.tools</groupId>
     <artifactId>TimeService</artifactId>
-    <version>1.4.0-RELEASE</version>
+    <version>1.4.2-RELEASE</version>
     <name>TimeService</name>
     <description>TimeService</description>
     <properties>
