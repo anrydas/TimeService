@@ -2,17 +2,32 @@ package das.tools.timeservice.exception;
 
 import das.tools.timeservice.entity.AppResponse;
 import das.tools.timeservice.entity.ResponseStatus;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.ControllerAdvice;
+import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
-@ControllerAdvice
+@RestControllerAdvice
+@Slf4j
 public class ApplicationExceptionHandler {
-    private ResponseEntity<AppResponse> handle(ApplicationException e) {
+    @ExceptionHandler(InvalidRequestException.class)
+    public ResponseEntity<AppResponse> handleInvalidRequest(InvalidRequestException e) {
+        return badRequest(e.getMessage());
+    }
+
+    @ExceptionHandler(MethodArgumentTypeMismatchException.class)
+    public ResponseEntity<AppResponse> handleTypeMismatch(MethodArgumentTypeMismatchException e) {
+        return badRequest("Invalid value '" + e.getValue() + "' of parameter '" + e.getName() + "'");
+    }
+
+    private ResponseEntity<AppResponse> badRequest(String message) {
+        log.warn("Bad request: {}", message);
         AppResponse res = AppResponse.builder()
                 .status(ResponseStatus.ERROR)
-                .message("Error: " + e.getLocalizedMessage())
+                .message("Error: " + message)
                 .build();
-        return new ResponseEntity<>(res, HttpStatus.INTERNAL_SERVER_ERROR);
+        return new ResponseEntity<>(res, HttpStatus.BAD_REQUEST);
     }
 }

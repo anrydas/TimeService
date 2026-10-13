@@ -13,7 +13,7 @@ import lombok.*;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class AppResponse {
     private ResponseStatus status;
-    private long epochTime;
+    private Long epochTime;
     private String formattedTime;
     private String message;
 }

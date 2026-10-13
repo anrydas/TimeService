@@ -12,13 +12,13 @@ import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.test.context.TestPropertySource;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.Instant;
-import java.util.Date;
+import java.time.temporal.ChronoUnit;
 import java.util.regex.Pattern;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -45,7 +45,6 @@ public class HttpResponseTest {
 
     @Test
     void epochGetShouldReturnJsonWithOkStatusAndEpochTimeLessThanNow() {
-        System.out.println(apiPrefix);
         String url = this.baseUrl + EPOCH_TIME_API_PATH;
         log.info("testing URL={}", url);
         AppResponse response = this.restTemplate.getForObject(url, AppResponse.class);
@@ -80,11 +79,6 @@ public class HttpResponseTest {
         AppResponse response = this.restTemplate.getForObject(url, AppResponse.class);
         assertThat(response.getStatus()).isSameAs(ResponseStatus.OK);
         long time = response.getEpochTime();
-        try {
-            Thread.sleep(1000);
-        } catch (InterruptedException e) {
-            throw new RuntimeException(e);
-        }
         assertThat(time).isLessThan(Instant.now().toEpochMilli());
         Pattern pattern = Pattern.compile("^\\d{13}$");
         assertThat(pattern.matcher(String.valueOf(time)).find()).isTrue();
@@ -124,20 +118,43 @@ public class HttpResponseTest {
     }
 
     @Test
-    void epochGetShouldReturnJsonWithOkStatusAndEpochTimeLessThanNowForFiveDays() {
+    void epochGetShouldReturnTimeShiftedByMinusFiveDays() {
         int valueToAdd = -5;
         String url = this.baseUrl + EPOCH_TIME_API_PATH + "?d=" + valueToAdd;
         log.info("testing URL={}", url);
+        long before = Instant.now().plus(valueToAdd, ChronoUnit.DAYS).toEpochMilli();
+        AppResponse response = this.restTemplate.getForObject(url, AppResponse.class);
+        long after = Instant.now().plus(valueToAdd, ChronoUnit.DAYS).toEpochMilli();
+        assertThat(response.getStatus()).isSameAs(ResponseStatus.OK);
+        assertThat(response.getEpochTime()).isBetween(before, after);
+    }
+
+    @Test
+    void fmtWithCustomMaskShouldReturnTimeInThatFormat() {
+        String url = this.baseUrl + FORMATTED_TIME_API_PATH + "?mask=yyyy";
         AppResponse response = this.restTemplate.getForObject(url, AppResponse.class);
         assertThat(response.getStatus()).isSameAs(ResponseStatus.OK);
-        long time = response.getEpochTime();
-        Instant now = Instant.now();
-        Pattern pattern = Pattern.compile("^\\d{13}$");
-        assertThat(pattern.matcher(String.valueOf(time)).find()).isTrue();
-        assertThat(time).isLessThan(now.plusSeconds(5 * 60).toEpochMilli());
-        SimpleDateFormat sdf = new SimpleDateFormat("DD");
-        int nowDay = Integer.parseInt(sdf.format(Date.from(now)));
-        int dayCorrected = Integer.parseInt(sdf.format(new Date(time)));
-        assertThat(nowDay + valueToAdd == dayCorrected).isTrue();
+        assertThat(response.getFormattedTime()).matches("^\\d{4}$");
+    }
+
+    @Test
+    void fmtWithInvalidMaskShouldReturnBadRequestWithErrorStatus() {
+        String url = this.baseUrl + FORMATTED_TIME_API_PATH + "?mask=Q";
+        ResponseEntity<AppResponse> result = this.restTemplate.getForEntity(url, AppResponse.class);
+        assertThat(result.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
+        assertThat(result.getBody()).isNotNull();
+        assertThat(result.getBody().getStatus()).isSameAs(ResponseStatus.ERROR);
+        assertThat(result.getBody().getEpochTime()).isNull();
+        assertThat(result.getBody().getMessage()).contains("Invalid mask");
+    }
+
+    @Test
+    void epochWithNonNumericShiftShouldReturnBadRequestWithErrorStatus() {
+        String url = this.baseUrl + EPOCH_TIME_API_PATH + "?h=abc";
+        ResponseEntity<AppResponse> result = this.restTemplate.getForEntity(url, AppResponse.class);
+        assertThat(result.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
+        assertThat(result.getBody()).isNotNull();
+        assertThat(result.getBody().getStatus()).isSameAs(ResponseStatus.ERROR);
+        assertThat(result.getBody().getMessage()).contains("'h'");
     }
 }

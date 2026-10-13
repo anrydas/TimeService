@@ -1,5 +1,6 @@
 package das.tools.timeservice.controller;
 
+import das.tools.timeservice.exception.InvalidRequestException;
 import das.tools.timeservice.service.TimeService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -27,7 +28,7 @@ public class TimeController {
     public ResponseEntity<?> getFormattedTime(@RequestParam(value = "mask", required = false) String mask,
                                               @RequestParam(value = "h", defaultValue = "0", required = false) int hour,
                                               @RequestParam(value = "m", defaultValue = "0", required = false) int minute,
-                                              @RequestParam(value = "d", defaultValue = "0", required = false) int day) {
+                                              @RequestParam(value = "d", defaultValue = "0", required = false) int day) throws InvalidRequestException {
         return ResponseEntity.ok(timeService.getFormattedTime(mask, hour, minute, day));
     }
 }

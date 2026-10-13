@@ -20,10 +20,12 @@
         <file>
             <source>${project.basedir}/start.sh</source>
             <outputDirectory>/</outputDirectory>
+            <fileMode>0755</fileMode>
         </file>
         <file>
             <source>${project.basedir}/stop.sh</source>
             <outputDirectory>/</outputDirectory>
+            <fileMode>0755</fileMode>
         </file>
     </files>
 </assembly>
